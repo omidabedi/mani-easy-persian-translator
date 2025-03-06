@@ -62,28 +62,34 @@ first_char="${word:0:1}"  # Get first character (UTF-8 safe)
 
 # Function to query Google Translate
 online_query() {
-
-    local input="$1"
+    local input="{\"format\":\"text\",\"from\":\"$2\",\"to\":\"$3\",\"input\":\"$1\",\"options\":{\"sentenceSplitter\":false,\"origin\":\"translation.web\",\"contextResults\":true,\"languageDetection\":true}}"
     local from_lang="$2"
     local target_lang="$3"
     local label="$4"
+    local base_url="https://api.reverso.net/translate/v1/translation"
     
-    local base_url="https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from_lang}&tl=${target_lang}&dt=t&ie=UTF-8&oe=UTF-8"
-    local ua='Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
-    local qry=$( echo $input | sed -E 's/\s{1,}/\+/g' )
-    local full_url=${base_url}
+    # Debug output (optional)
+    
+    # echo "$input"
+    
+    # Execute curl and store the result
 
-    local trans=$(curl --data-urlencode "q=$qry" -sA "${ua}" "${full_url}")
-    local translated=$(echo "$trans" | jq -r '.[0][0][0]' | tr '+' ' ')
+    local trans=$(curl -q -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" -s -k --header "Content-Type: application/json" --request POST --data "$input" "$base_url")
+    
+    # Debug output (optional)
 
-    if [ -n "$translated" ]; then
+    # echo "$trans"
+    
+    # Extract translated text from JSON response
+
+    local translated=$(echo "$trans" | jq -r '.translation[0]' 2>/dev/null)
+
+    if [ -n "$translated" ] && [ "$translated" != "null" ]; then
         notify-send "$label" "$translated" -t 15000
     else
         notify-send "$label" "Not found (online)" -t 15000
     fi
 }
-
-echo $first_char
 
 # Check if first character is Persian (using case statement)
 case "$first_char" in [آابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیي])  # Common Persian letters
@@ -94,7 +100,8 @@ case "$first_char" in [آابپتثجچحخدذرزژسشصضطظعغفقکگل�
         fi
         notify-send -a 'Mani' "Per2Eng" "$translation" -t 15000
         # Query Google Translate (Persian to English) in background
-        online_query "$word" "fa" "en" "GoogleTranslate(Per2Eng)" &
+        
+        online_query "$word" "per" "eng" "GoogleTranslate(Per2Eng)" &
         ;;
     *)
         word=$(echo $word | tr -dc "a-zA-Z0-9[:blank:].()'" | tr -s "'[:blank:]" )
@@ -105,8 +112,9 @@ case "$first_char" in [آابپتثجچحخدذرزژسشصضطظعغفقکگل�
         fi
         notify-send -a 'Mani' -h 'STRING:HH:Hintttt' "Eng2Per" "$eng_per" -t 15000
         # Query Google Translate (English to English and English to Persian) in background
-        online_query "$word" "en" "en" "GoogleTranslate(Eng2Eng)" &
-        online_query "$word" "en" "fa" "GoogleTranslate(Eng2Per)" &
+        # online_query "$word" "en" "en" "AI (Eng2Eng)" &
+       
+        online_query "$word" "eng" "per" "AI (Eng2Per)" &
         ;;
 esac
 EOF
