@@ -1,6 +1,6 @@
 # mani-easy-persian-translator
 
-**Mani** is a lightweight, yet powerful local and online English-to-Persian (and vice versa) translator for Linux, built with Bash. It's designed to be fast, simple, and easy to use directly from your keyboard shortcut.
+**Mani** is a lightweight, yet powerful local and online any-language to Persian (and vice versa) translator for Linux, built with Bash. It's designed to be fast, simple, and easy to use directly from your keyboard shortcut.
 
 ---
 
@@ -17,7 +17,7 @@ This will download and install the necessary files to your system.
 🧑‍💻 How to Use
 Once installed, you can set up a keyboard shortcut, such as Ctrl + Shift + M, to trigger the translator. By default, the script is located at ~/mani.sh.
 
-Highlight the English or Persian text you want to translate.
+Highlight the text you want to translate.
 Press your chosen keyboard shortcut (Ctrl + Shift + M).
 The translation will appear as a desktop notification.
 It's a simple and effective tool, created as a side project to solve a personal need, with some help from Grok.
