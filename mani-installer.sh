@@ -66,7 +66,9 @@ online_query() {
     local from_lang="$2"
     local target_lang="$3"
     local label="$4"
+    local qry=$( echo $1 | sed -E 's/\s{1,}/\+/g' )
     local base_url="https://api.reverso.net/translate/v1/translation"
+    local base_syn="https://synonyms.reverso.net/api/v2/search/en/$qry?limit=60&merge=true&rude=false&colloquial=false&exact=true"
     
     # Debug output (optional)
     
@@ -74,20 +76,26 @@ online_query() {
     
     # Execute curl and store the result
 
-    local trans=$(curl -q -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" -s -k --header "Content-Type: application/json" --request POST --data "$input" "$base_url")
+    local trans=$(curl -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" -s -k --header "Content-Type: application/json" --request POST --data "$input" "$base_url")
+    local transSyn=$(curl -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" -s -k --request GET "$base_syn")
     
     # Debug output (optional)
 
-    # echo "$trans"
+    # echo $transSyn
     
     # Extract translated text from JSON response
 
     local translated=$(echo "$trans" | jq -r '.translation[0]' 2>/dev/null)
+    local parseSyn=$(echo "$transSyn" | jq -r 'if has("error") then "Error present" else .results[0].cluster[:10][].word end')
+
+    # echo $parseSyn
 
     if [ -n "$translated" ] && [ "$translated" != "null" ]; then
         notify-send "$label" "$translated" -t 15000
-    else
-        notify-send "$label" "Not found (online)" -t 15000
+    fi
+
+    if [ -n "$parseSyn" ] && [ "$parseSyn" != "null" ]; then
+        notify-send "$label" "$parseSyn" -t 15000
     fi
 }
 
