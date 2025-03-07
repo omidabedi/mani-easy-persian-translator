@@ -30,3 +30,4 @@ Feel free to:
 Customize it for your own needs.
 Contribute to the development and improvement of this tool.
 This is a hobby project, so any feedback or contributions are very much appreciated! 💙
+

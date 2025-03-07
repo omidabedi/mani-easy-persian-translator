@@ -48,8 +48,6 @@ sdcv -u 'Eng2Per (en-fa)' -n "hello"
 echo "Testing per-to-eng_stardict with 'سلام' using explicit path..."
 sdcv -u 'Per2Eng (fa-en)' -n "سلام"
 
-
-# Create the translation script with correct dictionary names
 echo "Creating translation script with notify-send and Google Translate..."
 cat << 'EOF' > ~/mani.sh
 #!/bin/bash
